@@ -1,0 +1,85 @@
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Player = Players.LocalPlayer
+if not Player then
+    Player = Players.PlayerAdded:Wait()
+end
+
+local Character = Player.CharacterAdded:Wait()
+
+local Backpack = Player:WaitForChild("Backpack")
+local CurrentRooms = workspace:WaitForChild("CurrentRooms")
+
+local GetKey = false
+local OpenDoor = false
+local PlayerDied = false
+local PlayAgint = false
+local Targets = {
+    "KeyObtain",
+    "Lock"
+}
+
+local function AutoDeath()
+    RunService.Heartbeat:Connect(function()
+        local LatestRoomValue = ReplicatedStorage.GameData.LatestRoom.Value
+        local CurrentRoom = CurrentRooms:FindFirstChild(LatestRoomValue)
+        local LatestRoomValue = ReplicatedStorage.GameData.LatestRoom.Value
+        if GetKey == false then
+            for _, Room in pairs(CurrentRoom:GetDescendants()) do
+                local Key = Room:FindFirstChild("KeyObtain")
+                if Key then
+                    local KeyHitBox = Key:FindFirstChild("Hitbox")
+                    local HumanoidRootPart = Character:FindFirstChild("HumanoidRootPart")
+                    
+                    if KeyHitBox and HumanoidRootPart then
+                        HumanoidRootPart.CFrame = KeyHitBox.CFrame
+                    end
+                    if Backpack:FindFirstChild("Key") or Character:FindFirstChild("Key") then
+                        GetKey = true
+                    end
+                end
+            end
+        end
+        if LatestRoomValue > 0 then
+            OpenDoor = true
+            PlayerDied = true
+            replicatesignal(Player.Kill)
+            if PlayAgint == false then
+                ReplicatedStorage.RemotesFolder.PlayAgain:FireServer()
+                PlayAgint = true
+            end
+        end
+        if GetKey == true then
+            local function Target(obj)
+                while obj do
+                    if table.find(Targets, obj.Name) then
+                        return true
+                    end 
+                    obj = obj.Parent
+                end
+                return false
+            end
+            for _, ProximityPrompt in ipairs(CurrentRooms:GetDescendants()) do
+                if ProximityPrompt:IsA("ProximityPrompt") and Target(ProximityPrompt) then
+                    fireproximityprompt(ProximityPrompt)
+                end
+            end
+            
+            local Door = CurrentRoom:FindFirstChild("Door")
+            if Door then
+                local DoorAWA = Door:FindFirstChild("Door")
+                local HumanoidRootPart = Character:FindFirstChild("HumanoidRootPart")
+                
+                if DoorAWA and HumanoidRootPart then
+                    HumanoidRootPart.CFrame = DoorAWA.CFrame
+                end
+            end
+        end
+    end)
+end
+
+if game.PlaceId == 6839171747 then
+    AutoDeath()
+end
