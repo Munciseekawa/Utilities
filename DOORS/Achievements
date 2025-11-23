@@ -1,8 +1,6 @@
--- Services
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
--- Variables
 local localPlayer = Players.LocalPlayer
 local playerGui = localPlayer:WaitForChild("PlayerGui")
 
@@ -14,15 +12,9 @@ local defaultAchievement = {
     Title = "Title",
     Desc = "Description",
     Reason = "Reason",
-    Image = "rbxassetid://12309073114",
-    Prize = {
-        Revives = 1,
-        Knobs = 100,
-        Stardust = 20
-    }
+    Image = "rbxassetid://12309073114"
 }
 
--- Main
 return function(info)
     info = (type(info) == "table") and info or {}
     for i, v in defaultAchievement do
